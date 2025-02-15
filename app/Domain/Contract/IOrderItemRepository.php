@@ -10,7 +10,7 @@ interface IOrderItemRepository
     public function getAll(): array;
     public function getPaginated(int $perPage): LengthAwarePaginator;
     public function getById(int $id): ?OrderItem;
-    public function create(OrderItem $orderItem): OrderItem;
-    public function update(OrderItem $orderItem): OrderItem;
+    public function create(OrderItem $orderItem): string;
+    public function update(OrderItem $orderItem): string;
     public function delete(int $id): bool;
 }

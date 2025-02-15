@@ -25,7 +25,7 @@ class OrderItemUseCase
         return $this->repository->getById($id);
     }
 
-    public function create(array $data): OrderItem
+    public function create(array $data): string
     {
         return $this->repository->create(new OrderItem(
             null,
@@ -36,7 +36,7 @@ class OrderItemUseCase
         ));
     }
 
-    public function update(int $id, array $data): OrderItem
+    public function update(int $id, array $data): string
     {
         return $this->repository->update(new OrderItem(
             $id,

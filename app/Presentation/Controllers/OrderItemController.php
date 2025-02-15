@@ -37,14 +37,20 @@ class OrderItemController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        $orderItem = $this->orderItemUseCase->create($request->validate([
+        $validatedData = $request->validate([
             'order_id' => 'required|integer|exists:orders,id',
             'product_id' => 'required|integer|exists:products,id',
             'quantity' => 'required|integer',
             'price' => 'required|numeric',
-        ]));
+        ]);
 
-        return response()->json($orderItem, 201);
+        $orderItem = $this->orderItemUseCase->create($validatedData);
+
+        if (str_contains($orderItem, "Not enough stock")) {
+            return response()->json(['error' => $orderItem], 400);
+        }
+
+        return response()->json(['message' => $orderItem], 201);
     }
 
     public function update(Request $request, int $id): JsonResponse
@@ -53,14 +59,20 @@ class OrderItemController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        $orderItem = $this->orderItemUseCase->update($id, $request->validate([
+        $validatedData = $request->validate([
             'order_id' => 'required|integer|exists:orders,id',
             'product_id' => 'required|integer|exists:products,id',
             'quantity' => 'required|integer',
             'price' => 'required|numeric',
-        ]));
+        ]);
 
-        return response()->json($orderItem);
+        $orderItem = $this->orderItemUseCase->update($id, $validatedData);
+
+        if (str_contains($orderItem, "Not enough stock")) {
+            return response()->json(['error' => $orderItem], 400);
+        }
+
+        return response()->json(['message' => $orderItem], 200);
     }
 
     public function destroy(int $id): JsonResponse

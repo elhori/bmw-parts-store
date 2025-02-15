@@ -3,6 +3,7 @@
 namespace App\Infra\Repositories;
 
 use App\Domain\Contract\IOrderItemRepository;
+use App\Infra\Models\Product;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use App\Domain\Entities\OrderItem;
 use App\Infra\Models\OrderItem as OrderItemModel;
@@ -25,17 +26,41 @@ class OrderItemRepository implements IOrderItemRepository
         return $orderItem ? $this->mapToEntity($orderItem) : null;
     }
 
-    public function create(OrderItem $orderItem): OrderItem
+    public function create(OrderItem $orderItem): string
     {
+        $product = Product::findOrFail($orderItem->productId);
+
+        if ($orderItem->quantity > $product->stock) {
+            return "Not enough stock for product {$product->name}. Available stock: {$product->stock}";
+        }
+
         $model = OrderItemModel::create($orderItem->toArray());
-        return $this->mapToEntity($model);
+
+        $product->decrement('stock', $orderItem->quantity);
+
+        return "Successfully created order item {$model->id}";
     }
 
-    public function update(OrderItem $orderItem): OrderItem
+    public function update(OrderItem $orderItem): string
     {
-        $model = OrderItemModel::findOrFail($orderItem->id);
-        $model->update($orderItem->toArray());
-        return $this->mapToEntity($model);
+        $product = Product::findOrFail($orderItem->productId);
+        $existingOrderItem = OrderItemModel::findOrFail($orderItem->id);
+
+        if ($orderItem->quantity > $product->stock + $existingOrderItem->quantity) {
+            return "Not enough stock for product {$product->name}. Available stock: {$product->stock}";
+        }
+
+        $quantityDifference = $orderItem->quantity - $existingOrderItem->quantity;
+
+        if ($quantityDifference > 0) {
+            $product->decrement('stock', $quantityDifference);
+        } elseif ($quantityDifference < 0) {
+            $product->increment('stock', abs($quantityDifference));
+        }
+
+        $existingOrderItem->update($orderItem->toArray());
+
+        return "Successfully updated order item {$existingOrderItem->id}";
     }
 
     public function delete(int $id): bool
