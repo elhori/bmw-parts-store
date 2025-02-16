@@ -1,6 +1,7 @@
 <?php
 
 use App\Presentation\Controllers\AuthController;
+use App\Presentation\Controllers\CartController;
 use App\Presentation\Controllers\CategoryController;
 use App\Presentation\Controllers\OrderController;
 use App\Presentation\Controllers\OrderItemController;
@@ -63,4 +64,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/users/change-password/{id}', [UserController::class, 'changePassword']);
     Route::put('/users/{id}/make-admin', [UserController::class, 'changeRoleToAdmin']);
     Route::put('/users/{id}/make-manager', [UserController::class, 'changeRoleToManager']);
+});
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/cart', [CartController::class, 'getCart']);
+    Route::post('/cart/add', [CartController::class, 'addProductToCart']);
+    Route::delete('/cart/remove', [CartController::class, 'removeProductFromCart']);
+    Route::put('/cart/update', [CartController::class, 'updateCartItemQuantity']);
 });

@@ -2,11 +2,13 @@
 
 namespace App\Providers;
 
+use App\Domain\Contract\ICartRepository;
 use App\Domain\Contract\ICategoryRepository;
 use App\Domain\Contract\IOrderItemRepository;
 use App\Domain\Contract\IOrderRepository;
 use App\Domain\Contract\IProductRepository;
 use App\Domain\Contract\IUserRepository;
+use App\Infra\Repositories\CartRepository;
 use App\Infra\Repositories\CategoryRepository;
 use App\Infra\Repositories\OrderItemRepository;
 use App\Infra\Repositories\OrderRepository;
@@ -27,6 +29,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(IOrderRepository::class, OrderRepository::class);
         $this->app->bind(IOrderitemRepository::class, OrderItemRepository::class);
         $this->app->bind(IUserRepository::class, UserRepository::class);
+        $this->app->bind(ICartRepository::class, CartRepository::class);
     }
 
     /**
