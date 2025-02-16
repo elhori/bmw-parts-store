@@ -38,7 +38,7 @@ class OrderItemRepository implements IOrderItemRepository
 
         $product->decrement('stock', $orderItem->quantity);
 
-        return "Successfully created order item {$model->id}";
+        return "Successfully created order item";
     }
 
     public function update(OrderItem $orderItem): string
@@ -60,7 +60,7 @@ class OrderItemRepository implements IOrderItemRepository
 
         $existingOrderItem->update($orderItem->toArray());
 
-        return "Successfully updated order item {$existingOrderItem->id}";
+        return "Successfully updated order item";
     }
 
     public function delete(int $id): bool
