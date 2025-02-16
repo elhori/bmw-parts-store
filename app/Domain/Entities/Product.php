@@ -2,7 +2,9 @@
 
 namespace App\Domain\Entities;
 
-class Product
+use App\Domain\Contract\Imageable;
+
+class Product implements Imageable
 {
     public function __construct(
         public ?int $id,
@@ -23,5 +25,15 @@ class Product
             'stock' => $this->stock,
             'category_id' => $this->categoryId,
         ];
+    }
+
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
+    public function getImageableType(): string
+    {
+        return \App\Infra\Models\Product::class;
     }
 }

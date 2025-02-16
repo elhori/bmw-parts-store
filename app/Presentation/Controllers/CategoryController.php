@@ -46,25 +46,33 @@ class CategoryController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        $category = $this->categoryUseCase->create($request->validate([
+        $validated = $request->validate([
             'name' => 'required|string',
-        ]));
+            'image' => 'nullable|image|max:2048'
+        ]);
+
+        $category = $this->categoryUseCase->create($validated, $request->file('image'));
 
         return response()->json($category, 201);
     }
 
-    public function update(Request $request, int $id): JsonResponse
+    public function update(Request $request): JsonResponse
     {
         if (!Gate::allows('edit-categories')) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        $category = $this->categoryUseCase->update($id, $request->validate([
+        $validated = $request->validate([
+            'id' => 'required|integer|exists:categories,id',
             'name' => 'required|string',
-        ]));
+            'image' => 'nullable|image|max:2048',
+        ]);
+
+        $category = $this->categoryUseCase->update($validated, $request->file('image'));
 
         return response()->json($category);
     }
+
 
     public function destroy(int $id): JsonResponse
     {

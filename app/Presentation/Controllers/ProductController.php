@@ -46,33 +46,41 @@ class ProductController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        $product = $this->productUseCase->create($request->validate([
+        $validated = $request->validate([
             'name' => 'required|string',
             'description' => 'nullable|string',
             'price' => 'required|numeric',
             'stock' => 'required|integer',
             'category_id' => 'nullable|integer|exists:categories,id',
-        ]));
+            'image' => 'nullable|image|max:2048'
+        ]);
+
+        $product = $this->productUseCase->create($validated, $request->file('image'));
 
         return response()->json($product, 201);
     }
 
-    public function update(Request $request, int $id): JsonResponse
+    public function update(Request $request): JsonResponse
     {
         if (!Gate::allows('edit-products')) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        $product = $this->productUseCase->update($id, $request->validate([
+        $validated = $request->validate([
+            'id' => 'required|integer|exists:products,id',
             'name' => 'required|string',
             'description' => 'nullable|string',
             'price' => 'required|numeric',
             'stock' => 'required|integer',
             'category_id' => 'nullable|integer|exists:categories,id',
-        ]));
+            'image' => 'nullable|image|max:2048',
+        ]);
+
+        $product = $this->productUseCase->update($validated, $request->file('image'));
 
         return response()->json($product);
     }
+
 
     public function destroy(int $id): JsonResponse
     {

@@ -2,7 +2,9 @@
 
 namespace App\Domain\Entities;
 
-class Category
+use App\Domain\Contract\Imageable;
+
+class Category implements Imageable
 {
     public function __construct(
         public ?int   $id,
@@ -17,5 +19,15 @@ class Category
             'id' => $this->id,
             'name' => $this->name,
         ];
+    }
+
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
+    public function getImageableType(): string
+    {
+        return \App\Infra\Models\Category::class;
     }
 }

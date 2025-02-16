@@ -3,12 +3,16 @@
 namespace App\Application\UseCases;
 
 use App\Domain\Contract\ICategoryRepository;
+use App\Domain\Contract\IImageRepository;
 use App\Domain\Entities\Category;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Http\UploadedFile;
 
 class CategoryUseCase
 {
-    public function __construct(private ICategoryRepository $repository) {}
+    public function __construct(
+        private ICategoryRepository $repository,
+        private IImageRepository $imageRepository) {}
 
     public function getAll(): array
     {
@@ -30,14 +34,26 @@ class CategoryUseCase
         return $this->repository->search($searchTerm);
     }
 
-    public function create(array $data): Category
+    public function create(array $data, ?UploadedFile $image = null): Category
     {
-        return $this->repository->create(new Category(null, $data['name']));
+        $category = $this->repository->create(new Category(null, $data['name']));
+
+        if ($image) {
+            $this->imageRepository->uploadImage($image, $category);
+        }
+
+        return $category;
     }
 
-    public function update(int $id, array $data): Category
+    public function update(array $data, ?UploadedFile $image = null): Category
     {
-        return $this->repository->update(new Category($id, $data['name']));
+        $category = $this->repository->update(new Category($data['id'], $data['name']));
+
+        if ($image) {
+            $this->imageRepository->uploadImage($image, $category);
+        }
+
+        return $category;
     }
 
     public function delete(int $id): bool

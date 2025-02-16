@@ -40,7 +40,6 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         $exceptions->renderable(function (Exception $e, Request $request) {
-            // التعامل مع باقي الاستثناءات العامة
             return response()->json([
                 'message' => 'حدث خطأ غير متوقع.',
             ], 500);

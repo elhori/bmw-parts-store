@@ -2,13 +2,17 @@
 
 namespace App\Application\UseCases;
 
+use App\Domain\Contract\IImageRepository;
 use App\Domain\Contract\IProductRepository;
 use App\Domain\Entities\Product;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Http\UploadedFile;
 
 class ProductUseCase
 {
-    public function __construct(private IProductRepository $repository) {}
+    public function __construct(
+        private IProductRepository $repository,
+        private IImageRepository $imageRepository) {}
 
     public function getAll(): array
     {
@@ -30,9 +34,9 @@ class ProductUseCase
         return $this->repository->search($searchTerm);
     }
 
-    public function create(array $data): Product
+    public function create(array $data, ?UploadedFile $image = null): Product
     {
-        return $this->repository->create(new Product(
+        $product = $this->repository->create(new Product(
             null,
             $data['name'],
             $data['description'],
@@ -40,18 +44,30 @@ class ProductUseCase
             $data['stock'],
             $data['category_id'] ?? null
         ));
+
+        if ($image) {
+            $this->imageRepository->uploadImage($image, $product);
+        }
+
+        return $product;
     }
 
-    public function update(int $id, array $data): Product
+    public function update(array $data, ?UploadedFile $image = null): Product
     {
-        return $this->repository->update(new Product(
-            $id,
+        $product = $this->repository->update(new Product(
+            $data['id'],
             $data['name'],
             $data['description'],
             $data['price'],
             $data['stock'],
             $data['category_id'] ?? null
         ));
+
+        if ($image) {
+            $this->imageRepository->uploadImage($image, $product);
+        }
+
+        return $product;
     }
 
     public function delete(int $id): bool
