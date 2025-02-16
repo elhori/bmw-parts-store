@@ -5,6 +5,7 @@ namespace App\Application\UseCases;
 use App\Domain\Contract\IUserRepository;
 use App\Domain\Entities\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Hash;
 
 class UserUseCase
 {
@@ -36,7 +37,7 @@ class UserUseCase
             null,
             $data['name'],
             $data['email'],
-            bcrypt($data['password'])
+            Hash::make($data['password'])
         ));
     }
 
@@ -46,7 +47,7 @@ class UserUseCase
             $id,
             $data['name'],
             $data['email'],
-            isset($data['password']) ? bcrypt($data['password']) : null
+            isset($data['password']) ? Hash::make($data['password']) : null
         ));
     }
 
